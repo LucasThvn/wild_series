@@ -1,0 +1,13 @@
+@import "~bootstrap/scss/bootstrap";
+
+$primary-color: #E77873;
+$background-color: whitesmoke;
+
+
+.bg-light {
+  background-color: $primary-color !important;
+}
+
+body {
+    background-color: $background-color;
+}
