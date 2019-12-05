@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class WildController extends AbstractController
 {
     /**
-     * @Route("/wild", name="wild_index")
+     * @Route("/", name="wild_index")
      */
 
     public function index(): Response
@@ -36,5 +36,14 @@ class WildController extends AbstractController
             $response = ucwords(implode(' ',explode('-', $slug)));
         }
         return $this->render('wild/show.html.twig', ['slug' => $response]);
+    }
+
+
+    /**
+     * @Route("/wild/category/{categoryName}", name="show_category")
+     */
+    public function showByCategory(string $categoryName)
+    {
+
     }
 }
