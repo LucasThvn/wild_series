@@ -3,7 +3,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
+use App\Entity\Season;
 use App\Entity\Program;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,11 +64,32 @@ class WildController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/wild/category/{categoryName}", name="show_category")
-     */
-    public function showByCategory(string $categoryName)
-    {
 
+    /**
+     * @param int $id
+     * @return Response
+     * @Route("/season/{id<^[0-9-]+$>}", defaults={"id" = null}, name="season_show")
+     */
+    public function showBySeason(int $id) : Response
+    {
+        if (!$id) {
+            throw $this
+                ->createNotFoundException('No season has been find in season\'s table.');
+        }
+        $season = $this->getDoctrine()
+            ->getRepository(Season::class)
+            ->find($id);
+        $program = $season->getProgram();
+        $episodes = $season->getEpisodes();
+        if (!$season) {
+            throw $this->createNotFoundException(
+                'No season with '.$id.' season, found in Season\'s table.'
+            );
+        }
+        return $this->render('wild/season.html.twig', [
+            'program'  => $program,
+            'season'   => $season,
+            'episodes' => $episodes
+        ]);
     }
 }
