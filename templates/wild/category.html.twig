@@ -6,7 +6,8 @@
     <h1>Catégorie {{ category }}</h1>
     <ul>
         {% for program in programs %}
-            <li>{{ program.title }}</li>
+            <h2>{{ program.id }} - {{ program.title }}</h2>
+            <p>{{ program.summary }}</p>
         {% endfor %}
     </ul>
 {% endblock %}
