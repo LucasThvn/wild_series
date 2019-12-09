@@ -3,6 +3,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Entity\Program;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,10 +65,23 @@ class WildController extends AbstractController
     }
 
     /**
-     * @Route("/wild/category/{categoryName}", name="show_category")
+     * @Route("/category/{categoryName}", name="show_category")
      */
     public function showByCategory(string $categoryName)
     {
+        $category = $this->getDoctrine()
+            ->getRepository(Category::class)
+            ->findOneBy(['name' => $categoryName]);
+        $programs = $this->getDoctrine()
+            ->getRepository(Program::class)
+            ->findBy(['category' => $category],
+                ['id' => 'DESC'],
+                3
+            );
 
+        return $this->render('wild/category.html.twig',[
+            'programs' => $programs,
+            'category' => $categoryName,
+        ]);
     }
 }
