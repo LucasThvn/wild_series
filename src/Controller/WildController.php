@@ -3,11 +3,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
 use App\Entity\Episode;
 use App\Entity\Season;
 use App\Entity\Program;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use App\Form\ProgramSearchType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -20,16 +22,24 @@ class WildController extends AbstractController
     public function index(): Response
     {
         $programs = $this->getDoctrine()
-                ->getRepository(Program::class)
-                ->findAll();
+            ->getRepository(Program::class)
+            ->findAll();
 
         if (!$programs) {
             throw $this->createNotFoundException(
                 'No program found in program\'s table.'
             );
         }
+
+        $form = $this->createForm(
+            ProgramSearchType::class,
+            null,
+            ['method' => Request::METHOD_GET]
+        );
+
         return $this->render('wild/index.html.twig', [
             'programs' => $programs,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -41,7 +51,7 @@ class WildController extends AbstractController
      * @Route("/show/{slug<^[a-z0-9-]+$>}", defaults={"slug" = null}, name="wild_show")
      * @return Response
      */
-    public function showByProgram(?string $slug):Response
+    public function showByProgram(?string $slug): Response
     {
         if (!$slug) {
             throw $this
@@ -56,13 +66,13 @@ class WildController extends AbstractController
             ->findOneByTitle(mb_strtolower($slug));
         if (!$program) {
             throw $this->createNotFoundException(
-                'No program with '.$slug.' title, found in program\'s table.'
+                'No program with ' . $slug . ' title, found in program\'s table.'
             );
         }
 
         return $this->render('wild/show.html.twig', [
             'program' => $program,
-            'slug'  => $slug,
+            'slug' => $slug,
         ]);
     }
 
@@ -72,7 +82,7 @@ class WildController extends AbstractController
      * @return Response
      * @Route("/season/{id<^[0-9-]+$>}", defaults={"id" = null}, name="season_show")
      */
-    public function showBySeason(int $id) : Response
+    public function showBySeason(int $id): Response
     {
         if (!$id) {
             throw $this
@@ -85,12 +95,12 @@ class WildController extends AbstractController
         $episodes = $season->getEpisodes();
         if (!$season) {
             throw $this->createNotFoundException(
-                'No season with '.$id.' season, found in Season\'s table.'
+                'No season with ' . $id . ' season, found in Season\'s table.'
             );
         }
         return $this->render('wild/season.html.twig', [
-            'program'  => $program,
-            'season'   => $season,
+            'program' => $program,
+            'season' => $season,
             'episodes' => $episodes
         ]);
     }
@@ -101,14 +111,28 @@ class WildController extends AbstractController
      * @return Response
      * @Route("/episode/{id}", name="episode_show")
      */
-    public function showEpisode(Episode $episode) :Response
+    public function showEpisode(Episode $episode): Response
     {
         $season = $episode->getSeason();
         $program = $season->getProgram();
         return $this->render('wild/episode.html.twig', [
-            'program'  => $program,
-            'season'   => $season,
+            'program' => $program,
+            'season' => $season,
             'episode' => $episode,
+        ]);
+    }
+
+    /**
+     * @Route("/category/", name="show_category")
+     */
+    public function showByCategory()
+    {
+        $categories = $this->getDoctrine()
+            ->getRepository(Category::class)
+            ->findAll();
+
+        return $this->render('category/category.html.twig', [
+            'categories' => $categories,
         ]);
     }
 }
