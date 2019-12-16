@@ -29,7 +29,7 @@ class Category
     private $programs;
 
     /**
-     * Category constructor.
+     * category constructor.
      */
     public function __construct()
     {
